@@ -1,4 +1,10 @@
-Easily start and stop docker compose projects with captain.
+# Captain
+
+Easily start and stop docker compose projects with captain, arrrrr.
+
+<p align="center">
+<img src="https://jenssegers.com/uploads/images/captain.png" width="250">
+</p>
 
 ## Installation
 
