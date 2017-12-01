@@ -1,0 +1,125 @@
+#!/bin/bash
+
+#ENVIRONMENT VARIABLES
+
+# @info:	Current version
+declare VERSION="0.0.1"
+
+# @info:	Debug mode
+declare DEBUG=false
+
+# @info:	Base project folder
+declare FOLDER=$HOME
+
+# @info:	Maximum search depth
+declare MAX_DEPTH=5
+
+#FUNCTIONS
+
+# @info:    Parses and validates the CLI arguments
+function cli() {
+	if [[ "$#" -eq 0 ]]; then
+		usage; exit 0
+	fi
+
+	while [[ "$#" -gt 0 ]]; do
+		key="$1"
+		val="$2"
+		case $key in
+			up | start ) MODE="start"; SEARCH=$val; shift ;;
+			down | stop ) MODE="stop"; SEARCH=$val; shift ;;
+			update ) update; exit 0 ;;
+			-V | --verbose) DEBUG=true ;;
+			-v | --version) version; exit 0 ;;
+			-h | --help | *) usage; exit 0 ;;
+		esac
+		shift
+	done
+
+	captain
+}
+
+# @info:	Prints out current version
+function version {
+	echo $VERSION
+}
+
+# @info:	Prints out usage
+function usage {
+	echo "Easily start and stop docker-compose projects"
+	echo
+	echo "Usage:"
+	echo "  captain start [PROJECT]"
+	echo "  captain stop [PROJECT]"
+	echo
+	echo "Options:"
+	echo "  -d or --debug       Display debug information"
+	echo "  -h or --help        Opens this help menu"
+	echo "  -v or --version     Prints the current captain version"
+}
+
+# @info:	Check if docker is installed
+function check {
+	docker ps &>/dev/null
+	DOCKER_CHECK=$?
+
+	if [ ! "$DOCKER_CHECK" ]; then
+		echo "Docker is either not installed, or the Docker Daemon is not currently connected."
+		echo "Please check your installation and try again."
+		exit 1;
+	fi
+}
+
+# @info:	Log debug information
+function debug() {
+	if $DEBUG; then
+		echo $@
+	fi
+}
+
+# @info:	Update captain script
+function update {
+	echo "Not implemented yet"
+}
+
+# @info:	Main captain function
+function captain {
+	if [[ ! $SEARCH ]]; then
+		usage; exit 1
+	fi
+
+	debug "Searching for projects in $FOLDER"
+
+	for depth in $(seq 1 $MAX_DEPTH) ; do
+		# Search for docker compose files.
+		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
+		debug "Found ${#files[@]} projects at depth $depth"
+
+		for file in ${files[@]}; do
+			path=$(dirname $file)
+			project=${path##*/}
+
+			# See if this project matches what we are searching for.
+			if [[ $project == *"$SEARCH"* ]]; then
+				debug "Matched $SEARCH with $project"
+				cd $path
+
+				case $MODE in
+					start )
+						echo "Starting project $project"
+						echo
+						docker-compose up -d ;;
+					stop )
+						echo "Stopping project $project"
+						echo
+						docker-compose stop ;;
+				esac
+
+				exit 0
+			fi
+		done
+	done
+}
+
+check
+cli "$@"
