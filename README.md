@@ -1,5 +1,13 @@
 Easily start and stop docker compose projects with captain.
 
+## Installation
+
+Install `captain` on your machine with:
+
+```
+curl https://raw.githubusercontent.com/jenssegers/captain/master/captain > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+```
+
 ## Usage
 
 Captain searches for directories containing `docker-compose.yml` files and allows you to start and stop those services by passing a part of the parent directory name.
