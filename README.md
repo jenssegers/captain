@@ -33,3 +33,11 @@ Stopping a project works similarly:
 ```
 captain stop my-project
 ```
+
+### Updating captain
+
+Update your local captain version with:
+
+```
+captain update
+```
