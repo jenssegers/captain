@@ -29,8 +29,9 @@ function cli() {
 		key="$1"
 		val="$2"
 		case $key in
-			up | start ) MODE="start"; SEARCH=$val; shift ;;
-			down | stop ) MODE="stop"; SEARCH=$val; shift ;;
+			up | start | sail ) MODE="start"; SEARCH=$val; shift ;;
+			down | stop | dock ) MODE="stop"; SEARCH=$val; shift ;;
+			list | ls ) list; exit 0 ;;
 			update ) update; exit 0 ;;
 			-V | --verbose) DEBUG=true ;;
 			-v | --version) version; exit 0 ;;
@@ -52,8 +53,12 @@ function usage {
 	echo "Easily start and stop docker-compose projects"
 	echo
 	echo "Usage:"
-	echo "  captain start [PROJECT]"
-	echo "  captain stop [PROJECT]"
+	echo "  captain COMMAND"
+	echo
+	echo "Commands:"
+	echo "  start     Start a docker project"
+	echo "  stop      Start a docker project"
+	echo "  list      List available docker projects"
 	echo
 	echo "Options:"
 	echo "  -d or --debug       Display debug information"
@@ -86,6 +91,19 @@ function update {
 	curl -q $SOURCE 2>/dev/null > $0
 }
 
+# @info:	List docker projects
+function list {
+    for depth in $(seq 1 $MAX_DEPTH); do
+		# Search for docker compose files.
+		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
+
+		for file in ${files[@]}; do
+			path=$(dirname $file)
+			echo ${path##*/}
+		done
+	done
+}
+
 # @info:	Main captain function
 function captain {
 	if [[ ! $SEARCH ]]; then
@@ -94,7 +112,7 @@ function captain {
 
 	debug "Searching for projects in $FOLDER"
 
-	for depth in $(seq 1 $MAX_DEPTH) ; do
+	for depth in $(seq 1 $MAX_DEPTH); do
 		# Search for docker compose files.
 		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
 		debug "Found ${#files[@]} projects at depth $depth"
@@ -114,7 +132,7 @@ function captain {
 						echo
 						docker-compose up -d ;;
 					stop )
-						echo "Stopping project $project"
+						echo "Stopping project $project ..."
 						echo
 						docker-compose stop ;;
 				esac
