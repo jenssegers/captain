@@ -19,7 +19,7 @@ curl https://raw.githubusercontent.com/jenssegers/captain/master/captain > /usr/
 Captain searches for docker-compose projects in your `$HOME` folder and allows you to start and stop those projects by passing a part of the parent directory name.
 
 <p align="center">
-<img src="https://jenssegers.com/uploads/images/captain.gif">
+<img src="https://jenssegers.com/uploads/images/captain.gif?v2">
 </p>
 
 ### Starting a project
