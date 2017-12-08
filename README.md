@@ -6,7 +6,7 @@ Easily start and stop docker compose projects with captain, arrrrr.
 <img src="https://jenssegers.com/uploads/images/captain.png" width="250">
 </p>
 
-## Installation (OSX)
+## Installation (Unix: OSX, GNU/Linux, xBSD, ...)
 
 Install `captain` on your machine with:
 
