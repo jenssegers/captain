@@ -16,14 +16,20 @@ curl https://raw.githubusercontent.com/jenssegers/captain/master/captain > /usr/
 
 ## Usage
 
-Captain searches for directories containing `docker-compose.yml` files and allows you to start and stop those services by passing a part of the parent directory name.
+Captain searches for docker-compose projects in your `$HOME` folder and allows you to start and stop those projects by passing a part of the parent directory name.
 
 ### Starting a project
 
-If I have a folder called `my-project` that contains a `docker-compose.yml` file, I can start the services using:
+If I have a folder called `my-secret-project` that contains a `docker-compose.yml` file, I can start that project using:
 
 ```
-captain start my-project
+captain start my-secret-project
+```
+
+Captain will also do partial matching of the project name, so that you can also use:
+
+```
+captain start secret
 ```
 
 ### Stopping a project
@@ -31,7 +37,7 @@ captain start my-project
 Stopping a project works similarly:
 
 ```
-captain stop my-project
+captain stop secret
 ```
 
 ### Listing projects
