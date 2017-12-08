@@ -6,7 +6,7 @@ Easily start and stop docker compose projects with captain, arrrrr.
 <img src="https://jenssegers.com/uploads/images/captain.png" width="250">
 </p>
 
-## Installation
+## Installation (OSX)
 
 Install `captain` on your machine with:
 
@@ -32,6 +32,14 @@ Stopping a project works similarly:
 
 ```
 captain stop my-project
+```
+
+### Listing projects
+
+You can see all managable projects using:
+
+```
+captain list
 ```
 
 ### Updating captain
