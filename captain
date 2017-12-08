@@ -56,9 +56,9 @@ function usage {
 	echo "  captain COMMAND"
 	echo
 	echo "Commands:"
-	echo "  start     Start a docker project"
-	echo "  stop      Stop a docker project"
-	echo "  list      List available docker projects"
+	echo "  start|up|sail       Start a docker project"
+	echo "  stop|down|dock      Stop a docker project"
+	echo "  list|ls             List available docker projects"
 	echo
 	echo "Options:"
 	echo "  -d or --debug       Display debug information"
