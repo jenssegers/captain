@@ -94,53 +94,61 @@ function update {
 # @info:	List docker projects
 function list {
     for depth in $(seq 1 $MAX_DEPTH); do
-		# Search for docker compose files.
-		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
+    # Search for docker compose files.
+    files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
+    check=()
 
-		for file in ${files[@]}; do
-			path=$(dirname $file)
-			echo ${path##*/}
-		done
-	done
+    for file in ${files[@]}; do
+      path=$(dirname $file)
+      project=${path##*/}
+      echo -e "$project | $path"
+    done
+  done
 }
 
 # @info:	Main captain function
 function captain {
-	if [[ ! $SEARCH ]]; then
-		usage; exit 1
-	fi
+  if [[ ! $SEARCH ]]; then
+    usage; exit 1
+  fi
 
-	debug "Searching for projects in $FOLDER"
+  debug "Searching for projects in $FOLDER"
 
-	for depth in $(seq 1 $MAX_DEPTH); do
-		# Search for docker compose files.
-		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
-		debug "Found ${#files[@]} projects at depth $depth"
+  for depth in $(seq 1 $MAX_DEPTH); do
+    # Search for docker compose files.
+    files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
+    debug "Found ${#files[@]} projects at depth $depth"
+    check=()
 
-		for file in ${files[@]}; do
-			path=$(dirname $file)
-			project=${path##*/}
+    for file in ${files[@]}; do
+      path=$(dirname $file)
+      project=${path##*/}
 
-			# See if this project matches what we are searching for.
-			if [[ $project == *"$SEARCH"* ]]; then
-				debug "Matched $SEARCH with $project"
-				cd $path
+      if [[ " ${check[@]} " =~ " $project " ]]; then
+        project=$(basename $(dirname $path))
+      else
+        check+=($project)
+      fi
+      # See if this project matches what we are searching for.
+      if [[ $project == *"$SEARCH"* ]]; then
+        debug "Matched $SEARCH with $project"
+        cd $path
 
-				case $MODE in
-					start )
-						echo "Starting project $project ..."
-						echo
-						docker-compose up -d ;;
-					stop )
-						echo "Stopping project $project ..."
-						echo
-						docker-compose stop ;;
-				esac
+        case $MODE in
+          start )
+            echo "Starting project $project ..."
+            echo
+            docker-compose up -d ;;
+          stop )
+            echo "Stopping project $project ..."
+            echo
+            docker-compose stop ;;
+        esac
 
-				exit 0
-			fi
-		done
-	done
+        exit 0
+      fi
+    done
+  done
 }
 
 check
