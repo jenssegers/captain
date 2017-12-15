@@ -96,7 +96,6 @@ function list {
     for depth in $(seq 1 $MAX_DEPTH); do
     # Search for docker compose files.
     files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
-    check=()
 
     for file in ${files[@]}; do
       path=$(dirname $file)
