@@ -115,9 +115,9 @@ function captain {
 
   for depth in $(seq 1 $MAX_DEPTH); do
     # Search for docker compose files.
+	check=()
     files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
     debug "Found ${#files[@]} projects at depth $depth"
-    check=()
 
     for file in ${files[@]}; do
       path=$(dirname $file)
