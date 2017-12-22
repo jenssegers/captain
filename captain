@@ -100,7 +100,7 @@ function list {
 		for file in ${files[@]}; do
 			path=$(dirname $file)
 			project=${path##*/}
-		    echo -e "$project ($path)"
+			echo -e "$project ($path)"
 		done
 	done
 }
