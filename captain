@@ -100,7 +100,7 @@ function list {
 		for file in ${files[@]}; do
 			path=$(dirname $file)
 			project=${path##*/}
-			echo -e "$project | $path"
+		    echo -e "$project ($path)"
 		done
 	done
 }
@@ -115,22 +115,20 @@ function captain {
 
 	for depth in $(seq 1 $MAX_DEPTH); do
 		# Search for docker compose files.
-		check=()
 		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
 		debug "Found ${#files[@]} projects at depth $depth"
 
 		for file in ${files[@]}; do
 			path=$(dirname $file)
-			project=${path##*/}
-
-			if [[ " ${check[@]} " =~ " $project " ]]; then
-				project=$(basename $(dirname $path))
-			else
-				check+=($project)
-			fi
 		
-			# See if this project matches what we are searching for.
-			if [[ $project == *"$SEARCH"* ]]; then
+			# See if this project matches what we are searching for. 
+			if [[ $path == *"$SEARCH"* ]]; then
+				for dir in ${path////$'\n'}; do
+					if [[ $dir == *"$SEARCH"* ]]; then
+						project=$dir
+					fi
+				done
+
 				debug "Matched $SEARCH with $project"
 				cd $path
 
