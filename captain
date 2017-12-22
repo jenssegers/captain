@@ -120,7 +120,8 @@ function captain {
 
 		for file in ${files[@]}; do
 			path=$(dirname $file)
-		
+			project=${path##*/}
+
 			# See if this project matches what we are searching for. 
 			if [[ $path == *"$SEARCH"* ]]; then
 				for dir in ${path////$'\n'}; do
