@@ -99,7 +99,8 @@ function list {
 
 		for file in ${files[@]}; do
 			path=$(dirname $file)
-			echo ${path##*/}
+			project=${path##*/}
+			echo -e "$project ($path)"
 		done
 	done
 }
@@ -121,8 +122,14 @@ function captain {
 			path=$(dirname $file)
 			project=${path##*/}
 
-			# See if this project matches what we are searching for.
-			if [[ $project == *"$SEARCH"* ]]; then
+			# See if this project matches what we are searching for. 
+			if [[ $path == *"$SEARCH"* ]]; then
+				for dir in ${path////$'\n'}; do
+					if [[ $dir == *"$SEARCH"* ]]; then
+						project=$dir
+					fi
+				done
+
 				debug "Matched $SEARCH with $project"
 				cd $path
 
