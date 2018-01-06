@@ -3,7 +3,7 @@
 #ENVIRONMENT VARIABLES
 
 # @info:	Current version
-declare VERSION="0.0.1"
+declare VERSION="0.0.2"
 
 # @info:	Debug mode
 declare DEBUG=false
@@ -122,7 +122,7 @@ function captain {
 			path=$(dirname $file)
 			project=${path##*/}
 
-			# See if this project matches what we are searching for. 
+			# See if this project matches what we are searching for.
 			if [[ $path == *"$SEARCH"* ]]; then
 				for dir in ${path////$'\n'}; do
 					if [[ $dir == *"$SEARCH"* ]]; then
