@@ -3,7 +3,7 @@
 #ENVIRONMENT VARIABLES
 
 # @info:	Current version
-declare VERSION="0.0.2"
+declare VERSION="0.0.3"
 
 # @info:	Debug mode
 declare DEBUG=false
@@ -13,6 +13,9 @@ declare FOLDER=$HOME
 
 # @info:	Maximum search depth
 declare MAX_DEPTH=5
+
+# @info:	Detached mode: Run containers in the background
+declare DETACHED=false
 
 # @info:	Upstream script location
 declare SOURCE="https://raw.githubusercontent.com/jenssegers/captain/master/captain"
@@ -33,6 +36,7 @@ function cli() {
 			down | stop | dock ) MODE="stop"; SEARCH=$val; shift ;;
 			list | ls ) list; exit 0 ;;
 			update ) update; exit 0 ;;
+			-d | --detached ) DETACHED=true ;;
 			-V | --verbose) DEBUG=true ;;
 			-v | --version) version; exit 0 ;;
 			-h | --help | *) usage; exit 0 ;;
@@ -61,7 +65,8 @@ function usage {
 	echo "  list|ls             List available docker projects"
 	echo
 	echo "Options:"
-	echo "  -d or --debug       Display debug information"
+	echo "  -d or --detached    Detached mode: Run containers in the background"
+	echo "  -V or --debug       Display debug information"
 	echo "  -h or --help        Opens this help menu"
 	echo "  -v or --version     Prints the current captain version"
 }
@@ -137,11 +142,19 @@ function captain {
 					start )
 						echo "Starting project $project ..."
 						echo
-						docker-compose up -d ;;
+						if $DETACHED; then
+							debug "Starting $project in detached mode"
+							docker-compose up -d
+						else
+							debug "Starting $project in normal mode"
+							docker-compose up
+						fi
+						;;
 					stop )
 						echo "Stopping project $project ..."
 						echo
-						docker-compose stop ;;
+						docker-compose stop
+						;;
 				esac
 
 				exit 0
