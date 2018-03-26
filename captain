@@ -92,8 +92,8 @@ function debug() {
 
 # @info:	Update captain script
 function update {
-	echo "Updating captain ..."
 	curl -q $SOURCE 2>/dev/null > $0
+	echo "Upated captain from $VERSION to $($0 --version)"
 }
 
 # @info:	List docker projects
