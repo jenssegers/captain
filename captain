@@ -3,7 +3,7 @@
 #ENVIRONMENT VARIABLES
 
 # @info:	Current version
-declare VERSION="0.0.3"
+declare VERSION="0.0.4"
 
 # @info:	Debug mode
 declare DEBUG=false
@@ -66,7 +66,7 @@ function usage {
 	echo
 	echo "Options:"
 	echo "  -d or --detached    Detached mode: Run containers in the background"
-	echo "  -V or --debug       Display debug information"
+	echo "  -V or --verbose     Display debug information"
 	echo "  -h or --help        Opens this help menu"
 	echo "  -v or --version     Prints the current captain version"
 }
@@ -98,7 +98,7 @@ function update {
 
 # @info:	List docker projects
 function list {
-    for depth in $(seq 1 $MAX_DEPTH); do
+	for depth in $(seq 1 $MAX_DEPTH); do
 		# Search for docker compose files.
 		files=(`find $FOLDER -maxdepth $depth -mindepth $depth -type f -name docker-compose.yml`)
 
@@ -140,6 +140,17 @@ function captain {
 
 				case $MODE in
 					start )
+						# Search for a local configuration file.
+						if [ -f captain.yml ]; then
+							debug "Found a captain.yml file in $project"
+							eval "$(yaml captain.yml)"
+
+							debug "Starting dependencies ${dependencies[@]} for $project"
+							for service in ${dependencies[@]}; do
+								$0 up $service &
+							done
+						fi
+
 						echo "Starting project $project ..."
 						echo
 						if $DETACHED; then
@@ -161,6 +172,35 @@ function captain {
 			fi
 		done
 	done
+}
+
+# @info:	Parse a yaml file, source https://gist.github.com/pkuczynski/8665367
+yaml() {
+	local yaml_file=$1
+	local prefix=$2
+	local s='[[:space:]]*'
+	local w='[a-zA-Z0-9_]*'
+	local fs=$(echo @|tr @ '\034')
+
+	(
+		sed -ne '/^--/s|--||g; s|\"|\\\"|g; s/\s*$//g;' \
+			-e "/#.*[\"\']/!s| #.*||g; /^#/s|#.*||g;" \
+			-e  "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+			-e "s|^\($s\)\($w\)$s[:-]$s\(.*\)$s\$|\1$fs\2$fs\3|p" |
+		awk -F"$fs" '{
+			indent = length($1)/2;
+			if (length($2) == 0) { conj[indent]="+";} else {conj[indent]="";}
+			vname[indent] = $2;
+			for (i in vname) {if (i > indent) {delete vname[i]}}
+			if (length($3) > 0) {
+				vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+				printf("%s%s%s%s=(\"%s\")\n", "'"$prefix"'",vn, $2, conj[indent-1],$3);
+			}
+		}' |
+		sed -e 's/_=/+=/g' \
+		-e '/\..*=/s|\.|_|' \
+		-e '/\-.*=/s|\-|_|'
+	) < "$yaml_file"
 }
 
 check
