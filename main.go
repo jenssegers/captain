@@ -20,7 +20,7 @@ type project struct {
 	Name string
 }
 
-func scan(wg *sync.WaitGroup, folder string, depth int, results *[]project) {
+func scan(wg *sync.WaitGroup, folder string, depth int, results chan project) {
 	defer wg.Done()
 
 	// Get all files and subdirectories in this directory.
@@ -38,10 +38,10 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results *[]project) {
 
 		// Search for docker-compose.yml file.
 		if !file.IsDir() && file.Name() == "docker-compose.yml" {
-			*results = append(*results, project{
+			results <- project{
 				Path: filepath.Dir(path),
 				Name: filepath.Dir(path),
-			})
+			}
 
 			// No need to continue scan other subdirectories
 			return
@@ -61,11 +61,20 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results *[]project) {
 
 func projects() []project {
 	usr, _ := user.Current()
-	projects := []project{}
+	channel := make(chan project)
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go scan(&wg, usr.HomeDir, 5, &projects)
+	go scan(&wg, usr.HomeDir, 5, channel)
+
+	// Turn channel into slice.
+	projects := []project{}
+	go func() {
+		for project := range channel {
+			projects = append(projects, project)
+		}
+	}()
+
 	wg.Wait()
 
 	return projects
