@@ -16,36 +16,39 @@ import (
 )
 
 type project struct {
-	path string
-	name string
+	Path string
+	Name string
 }
 
 func scan(wg *sync.WaitGroup, folder string, depth int, results *[]project) {
 	defer wg.Done()
 
+	// Get all files and subdirectories in this directory.
 	files, _ := ioutil.ReadDir(folder)
 	var directories []string
 
 	for _, file := range files {
 		path := folder + "/" + file.Name()
 
+		// Add subdirectories to list of yet to be scanned directories.
 		if file.IsDir() {
 			directories = append(directories, path)
 			continue
 		}
 
+		// Search for docker-compose.yml file.
 		if !file.IsDir() && file.Name() == "docker-compose.yml" {
 			*results = append(*results, project{
-				path: filepath.Dir(path),
-				name: filepath.Dir(path),
+				Path: filepath.Dir(path),
+				Name: filepath.Dir(path),
 			})
 
-			// Stop early, we found a docker compose project.
+			// No need to continue scan other subdirectories
 			return
 		}
 	}
 
-	// If this was not a docker compose project, we should search the sub directories.
+	// If no docker-compose.yml file was found, scan all subdirectories that we found.
 	if depth > 1 {
 		for _, folder := range directories {
 			wg.Add(1)
@@ -71,12 +74,12 @@ func projects() []project {
 func match(projects []project, pattern string) (project, error) {
 	dict := make(map[string]project)
 	for _, project := range projects {
-		dict[project.path] = project
+		dict[project.Path] = project
 	}
 
 	paths := make([]string, 0, len(projects))
 	for _, project := range projects {
-		paths = append(paths, project.path)
+		paths = append(paths, project.Path)
 	}
 
 	matches := fuzzy.Find(pattern, paths)
@@ -89,9 +92,25 @@ func match(projects []project, pattern string) (project, error) {
 	return projects[0], errors.New("no match found")
 }
 
-func up(project project) error {
-	cmd := exec.Command("docker-compose", "up")
-	cmd.Dir = project.path
+func up(project project, daemon bool) error {
+	var cmd *exec.Cmd
+
+	if daemon {
+		cmd = exec.Command("docker-compose", "up", "-d")
+	} else {
+		cmd = exec.Command("docker-compose", "up")
+	}
+
+	cmd.Dir = project.Path
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func down(project project) error {
+	cmd := exec.Command("docker-compose", "down")
+	cmd.Dir = project.Path
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
@@ -112,7 +131,13 @@ func main() {
 		{
 			Name:    "start",
 			Aliases: []string{"up", "sail"},
-			Usage:   "Start a docker compose project",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "daemon, d",
+					Usage: "Start project in daemon mode",
+				},
+			},
+			Usage: "Start a docker compose project",
 			Action: func(c *cli.Context) error {
 				project, err := search(c.Args().Get(0))
 
@@ -121,18 +146,37 @@ func main() {
 					return nil
 				}
 
-				fmt.Println("Starting " + project.name)
-				up(project)
+				fmt.Println("Starting " + project.Name + "\n")
+				up(project, c.Bool("daemon"))
 
 				return nil
 			},
 		},
 		{
-			Name:  "list",
-			Usage: "List available docker compose projects",
+			Name:    "stop",
+			Aliases: []string{"down"},
+			Usage:   "Stop a docker compose project",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args().Get(0))
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				fmt.Println("Stopping " + project.Name + "\n")
+				down(project)
+
+				return nil
+			},
+		},
+		{
+			Name:    "list",
+			Aliases: []string{"ls"},
+			Usage:   "List available docker compose projects",
 			Action: func(c *cli.Context) error {
 				for _, project := range projects() {
-					fmt.Println(project.name)
+					fmt.Println(project.Name)
 				}
 				return nil
 			},
