@@ -118,7 +118,7 @@ func up(project project, daemon bool) error {
 }
 
 func down(project project) error {
-	cmd := exec.Command("docker-compose", "down")
+	cmd := exec.Command("docker-compose", "stop")
 	cmd.Dir = project.Path
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
