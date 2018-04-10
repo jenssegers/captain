@@ -180,6 +180,18 @@ func main() {
 			},
 		},
 		{
+			Name:  "abandon",
+			Usage: "Stop all running docker containers",
+			Action: func(c *cli.Context) error {
+				fmt.Println("Stopping all containers\n")
+				cmd := exec.Command("sh", "-c", "docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}")
+				cmd.Stdout = os.Stdout
+				cmd.Stdin = os.Stdin
+				cmd.Stderr = os.Stderr
+				return cmd.Run()
+			},
+		},
+		{
 			Name:    "list",
 			Aliases: []string{"ls"},
 			Usage:   "List available docker compose projects",
