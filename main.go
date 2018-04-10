@@ -65,7 +65,7 @@ func projects() []project {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go scan(&wg, usr.HomeDir, 5, channel)
+	go scan(&wg, usr.HomeDir, 4, channel)
 
 	// Turn channel into slice.
 	projects := []project{}
@@ -142,8 +142,8 @@ func main() {
 			Aliases: []string{"up", "sail"},
 			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name:  "daemon, d",
-					Usage: "Start project in daemon mode",
+					Name:  "detach, d",
+					Usage: "Start project in detached mode",
 				},
 			},
 			Usage: "Start a docker compose project",
@@ -156,14 +156,14 @@ func main() {
 				}
 
 				fmt.Println("Starting " + project.Name + "\n")
-				up(project, c.Bool("daemon"))
+				up(project, c.Bool("detach"))
 
 				return nil
 			},
 		},
 		{
 			Name:    "stop",
-			Aliases: []string{"down"},
+			Aliases: []string{"down", "dock"},
 			Usage:   "Stop a docker compose project",
 			Action: func(c *cli.Context) error {
 				project, err := search(c.Args().Get(0))
