@@ -1,0 +1,8 @@
+hash: 19a0e5c384b74c03660fa5ffce63781dbb06fecd9748913bcd0011d23c58d531
+updated: 2018-04-04T18:02:37.0189534Z
+imports:
+- name: github.com/sahilm/fuzzy
+  version: 0e1c4a4e1f632f936a5c0fa6176076eea01c054b
+- name: github.com/urfave/cli
+  version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
+testImports: []
