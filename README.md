@@ -6,17 +6,25 @@ Easily start and stop docker compose projects with captain, arrrrr.
 <img src="https://jenssegers.com/uploads/images/captain.png" width="250">
 </p>
 
-## Installation (Unix: OSX, GNU/Linux, xBSD, ...)
+## Installation
 
-Install `captain` on your machine with:
+Install `captain` on your machine:
+
+### OSX
 
 ```
-curl https://raw.githubusercontent.com/jenssegers/captain/master/captain > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+curl -L https://github.com/jenssegers/captain/releases/download/0.1.0/captain-osx > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+```
+
+### Linux
+
+```
+curl -L https://github.com/jenssegers/captain/releases/download/0.1.0/captain-linux > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
 
 ## Usage
 
-Captain searches for docker-compose projects in your `$HOME` folder and allows you to start and stop those projects by passing a part of the parent directory name.
+Captain searches for docker-compose projects in your `$HOME` folder and allows you to start and stop those projects by matching the project's directory name.
 
 <p align="center">
 <img src="https://jenssegers.com/uploads/images/captain.gif?v2">
@@ -36,6 +44,12 @@ Captain will also do partial matching of the project name, so that you can also 
 captain start secret
 ```
 
+Captain is smart, and does fuzzy matching:
+
+```
+captain start scrt
+```
+
 ### Stopping a project
 
 Stopping a project works similarly:
@@ -52,10 +66,10 @@ You can see all managable projects using:
 captain list
 ```
 
-### Updating captain
+### Stopping all containers
 
-Update your local captain version with:
+To quickly stop all running docker containers, use:
 
 ```
-captain update
+captain abandon
 ```
