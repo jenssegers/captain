@@ -8,19 +8,23 @@ Easily start and stop docker compose projects with captain, arrrrr.
 
 ## Installation
 
-Install `captain` on your machine:
+Binaries can be manually downloaded from GitHub releases: https://github.com/jenssegers/captain/releases
 
-### OSX
+#### OSX
 
 ```
 curl -L https://github.com/jenssegers/captain/releases/download/0.2.0/captain-osx > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
 
-### Linux
+#### Linux
 
 ```
 curl -L https://github.com/jenssegers/captain/releases/download/0.2.0/captain-linux > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
+
+#### Windows (untested)
+
+Download `captain.exe` via https://github.com/jenssegers/captain/releases/download/0.2.0/captain.exe
 
 ## Usage
 
