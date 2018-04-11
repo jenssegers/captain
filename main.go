@@ -9,18 +9,35 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/sahilm/fuzzy"
 	"github.com/urfave/cli"
 )
 
-type project struct {
+type Project struct {
 	Path string
 	Name string
 }
 
-func scan(wg *sync.WaitGroup, folder string, depth int, results chan project) {
+type Config struct {
+	Root      string
+	Blacklist []string
+}
+
+var config Config
+
+func init() {
+	usr, _ := user.Current()
+
+	config = Config{
+		Blacklist: []string{usr.HomeDir + "/Library", usr.HomeDir + "/Applications"},
+		Root:      usr.HomeDir,
+	}
+}
+
+func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 	defer wg.Done()
 
 	// Get all files and subdirectories in this directory.
@@ -32,15 +49,22 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan project) {
 
 		// Add subdirectories to list of yet to be scanned directories.
 		if file.IsDir() {
+			// Check if folder is in blacklist.
+			for _, blacklist := range config.Blacklist {
+				if blacklist == path {
+					continue
+				}
+			}
+
 			directories = append(directories, path)
 			continue
 		}
 
 		// Search for docker-compose.yml file.
 		if !file.IsDir() && file.Name() == "docker-compose.yml" {
-			results <- project{
+			results <- Project{
 				Path: filepath.Dir(path),
-				Name: filepath.Dir(path),
+				Name: strings.Replace(filepath.Dir(path), config.Root, "", 1),
 			}
 
 			// No need to continue scan other subdirectories
@@ -59,16 +83,15 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan project) {
 	return
 }
 
-func projects() []project {
-	usr, _ := user.Current()
-	channel := make(chan project)
+func projects() []Project {
+	channel := make(chan Project)
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go scan(&wg, usr.HomeDir, 4, channel)
+	go scan(&wg, config.Root, 4, channel)
 
 	// Turn channel into slice.
-	projects := []project{}
+	projects := []Project{}
 	go func() {
 		for project := range channel {
 			projects = append(projects, project)
@@ -80,28 +103,28 @@ func projects() []project {
 	return projects
 }
 
-func match(projects []project, pattern string) (project, error) {
-	dict := make(map[string]project)
+func match(projects []Project, pattern string) (Project, error) {
+	dict := make(map[string]Project)
 	for _, project := range projects {
-		dict[project.Path] = project
+		dict[project.Name] = project
 	}
 
-	paths := make([]string, 0, len(projects))
+	list := make([]string, 0, len(projects))
 	for _, project := range projects {
-		paths = append(paths, project.Path)
+		list = append(list, project.Name)
 	}
 
-	matches := fuzzy.Find(pattern, paths)
+	matches := fuzzy.Find(pattern, list)
 
 	if len(matches) > 0 {
-		path := matches[0].Str
-		return dict[path], nil
+		name := matches[0].Str
+		return dict[name], nil
 	}
 
 	return projects[0], errors.New("no match found")
 }
 
-func up(project project, daemon bool) error {
+func up(project Project, daemon bool) error {
 	var cmd *exec.Cmd
 
 	if daemon {
@@ -117,7 +140,7 @@ func up(project project, daemon bool) error {
 	return cmd.Run()
 }
 
-func down(project project) error {
+func down(project Project) error {
 	cmd := exec.Command("docker-compose", "stop")
 	cmd.Dir = project.Path
 	cmd.Stdout = os.Stdout
@@ -126,7 +149,7 @@ func down(project project) error {
 	return cmd.Run()
 }
 
-func search(pattern string) (project, error) {
+func search(pattern string) (Project, error) {
 	return match(projects(), pattern)
 }
 
