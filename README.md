@@ -13,13 +13,13 @@ Install `captain` on your machine:
 ### OSX
 
 ```
-curl -L https://github.com/jenssegers/captain/releases/download/0.1.0/captain-osx > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+curl -L https://github.com/jenssegers/captain/releases/download/0.2.0/captain-osx > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
 
 ### Linux
 
 ```
-curl -L https://github.com/jenssegers/captain/releases/download/0.1.0/captain-linux > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+curl -L https://github.com/jenssegers/captain/releases/download/0.2.0/captain-linux > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
 
 ## Usage
