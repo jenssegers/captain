@@ -1,5 +1,7 @@
 # Captain
 
+[![Build Status](https://travis-ci.org/jenssegers/captain.svg?branch=master)](https://travis-ci.org/jenssegers/captain)
+
 Easily start and stop docker compose projects with captain, arrrrr.
 
 <p align="center">
