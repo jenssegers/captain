@@ -24,6 +24,7 @@ type Project struct {
 type Config struct {
 	Root      string
 	Blacklist []string
+	Depth     int
 }
 
 var config Config
@@ -34,6 +35,7 @@ func init() {
 	config = Config{
 		Blacklist: []string{usr.HomeDir + "/Library", usr.HomeDir + "/Applications"},
 		Root:      usr.HomeDir,
+		Depth:     5,
 	}
 }
 
@@ -88,7 +90,7 @@ func projects() []Project {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go scan(&wg, config.Root, 4, channel)
+	go scan(&wg, config.Root, config.Depth, channel)
 
 	// Turn channel into slice.
 	projects := []Project{}
@@ -157,7 +159,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "captain"
 	app.Usage = "Start and stop docker compose projects"
-	app.Version = "0.2.0"
+	app.Version = "0.2.1"
 
 	app.Commands = []cli.Command{
 		{
