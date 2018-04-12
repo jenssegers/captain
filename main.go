@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -36,6 +37,19 @@ func init() {
 		Blacklist: []string{usr.HomeDir + "/Library", usr.HomeDir + "/Applications"},
 		Root:      usr.HomeDir,
 		Depth:     5,
+	}
+
+	depth, ok := os.LookupEnv("CAPTAIN_DEPTH")
+	if ok {
+		depth, err := strconv.Atoi(depth)
+		if err == nil {
+			config.Depth = depth
+		}
+	}
+
+	root, ok := os.LookupEnv("CAPTAIN_ROOT")
+	if ok {
+		config.Root = root
 	}
 }
 
@@ -66,7 +80,7 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 		if !file.IsDir() && file.Name() == "docker-compose.yml" {
 			results <- Project{
 				Path: filepath.Dir(path),
-				Name: strings.Replace(filepath.Dir(path), config.Root, "", 1),
+				Name: strings.Trim(strings.Replace(filepath.Dir(path), config.Root, "", 1), "/"),
 			}
 
 			// No need to continue scan other subdirectories
