@@ -13,6 +13,8 @@ import (
 	"strings"
 	"sync"
 
+	cfg "captain/lib/config"
+
 	"github.com/sahilm/fuzzy"
 	"github.com/urfave/cli"
 )
@@ -22,21 +24,23 @@ type Project struct {
 	Name string
 }
 
-type Config struct {
-	Root      string
-	Blacklist []string
-	Depth     int
-}
-
-var config Config
+var config cfg.Config
+var path string
 
 func init() {
 	usr, _ := user.Current()
+	path = usr.HomeDir + "/.captain/config.yaml"
 
-	config = Config{
-		Blacklist: []string{usr.HomeDir + "/Library", usr.HomeDir + "/Applications"},
-		Root:      usr.HomeDir,
-		Depth:     5,
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		config = cfg.Config{
+			Blacklist: []string{usr.HomeDir + "/Library", usr.HomeDir + "/Applications"},
+			Root:      usr.HomeDir,
+			Depth:     5,
+		}
+
+		cfg.Init(config, path)
+	} else {
+		config = cfg.ParseYAML(path)
 	}
 
 	depth, ok := os.LookupEnv("CAPTAIN_DEPTH")
@@ -166,6 +170,12 @@ func down(project Project) error {
 }
 
 func search(pattern string) (Project, error) {
+	for _, alias := range config.Alias {
+		if pattern == strings.Split(alias, "|")[1] {
+			pattern = strings.Split(alias, "|")[0]
+			break
+		}
+	}
 	return match(projects(), pattern)
 }
 
@@ -239,6 +249,35 @@ func main() {
 					fmt.Println(project.Name)
 				}
 				return nil
+			},
+		},
+		{
+			Name:  "alias",
+			Usage: "Set an alias for a project",
+			Action: func(c *cli.Context) error {
+				if len(c.Args()) != 0 {
+					cfg.Set(path, config, c.Args().Get(0), c.Args().Get(1))
+				} else {
+					fmt.Println("alias not configured")
+				}
+				return nil
+			},
+		},
+		{
+			Name:  "logs",
+			Usage: "See the logs of a project",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args().Get(0))
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+				cmd := exec.Command("docker-compose", "logs")
+				cmd.Dir = project.Path
+				cmd.Stdout = os.Stdout
+				cmd.Stdin = os.Stdin
+				cmd.Stderr = os.Stderr
+				return cmd.Run()
 			},
 		},
 	}
