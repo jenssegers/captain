@@ -165,6 +165,24 @@ func down(project Project) error {
 	return cmd.Run()
 }
 
+func restart(project Project) error {
+	cmd := exec.Command("docker-compose", "restart")
+	cmd.Dir = project.Path
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+func build(project Project) error {
+	cmd := exec.Command("docker-compose", "build")
+	cmd.Dir = project.Path
+	cmd.Stdout = os.Stdout
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
 func search(pattern string) (Project, error) {
 	return match(projects(), pattern)
 }
@@ -214,6 +232,40 @@ func main() {
 
 				fmt.Println("Stopping " + project.Name + "\n")
 				down(project)
+
+				return nil
+			},
+		},
+		{
+			Name:  "restart",
+			Usage: "Restart a docker compose project",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args().Get(0))
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				fmt.Println("Restarting " + project.Name + "\n")
+				restart(project)
+
+				return nil
+			},
+		},
+		{
+			Name:  "build",
+			Usage: "Build a docker compose project",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args().Get(0))
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				fmt.Println("Building " + project.Name + "\n")
+				build(project)
 
 				return nil
 			},
