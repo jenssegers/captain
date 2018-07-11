@@ -140,42 +140,8 @@ func match(projects []Project, pattern string) (Project, error) {
 	return projects[0], errors.New("no match found")
 }
 
-func up(project Project, daemon bool) error {
-	var cmd *exec.Cmd
-
-	if daemon {
-		cmd = exec.Command("docker-compose", "up", "-d")
-	} else {
-		cmd = exec.Command("docker-compose", "up")
-	}
-
-	cmd.Dir = project.Path
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func down(project Project) error {
-	cmd := exec.Command("docker-compose", "stop")
-	cmd.Dir = project.Path
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func restart(project Project) error {
-	cmd := exec.Command("docker-compose", "restart")
-	cmd.Dir = project.Path
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
-
-func build(project Project) error {
-	cmd := exec.Command("docker-compose", "build")
+func dc(project Project, arg ...string) error {
+	cmd := exec.Command("docker-compose", arg...)
 	cmd.Dir = project.Path
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
@@ -213,7 +179,10 @@ func main() {
 				}
 
 				fmt.Println("Starting " + project.Name + "\n")
-				up(project, c.Bool("detach"))
+				if c.Bool("detach") {
+					dc(project, "up", "-d")
+				}
+				dc(project, "up")
 
 				return nil
 			},
@@ -231,7 +200,7 @@ func main() {
 				}
 
 				fmt.Println("Stopping " + project.Name + "\n")
-				down(project)
+				dc(project, "stop")
 
 				return nil
 			},
@@ -248,7 +217,7 @@ func main() {
 				}
 
 				fmt.Println("Restarting " + project.Name + "\n")
-				restart(project)
+				dc(project, "restart")
 
 				return nil
 			},
@@ -265,7 +234,23 @@ func main() {
 				}
 
 				fmt.Println("Building " + project.Name + "\n")
-				build(project)
+				dc(project, "build")
+
+				return nil
+			},
+		},
+		{
+			Name:  "logs",
+			Usage: "View container output from a docker compose project",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args().Get(0))
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				dc(project, "logs")
 
 				return nil
 			},
@@ -274,7 +259,7 @@ func main() {
 			Name:  "abandon",
 			Usage: "Stop all running docker containers",
 			Action: func(c *cli.Context) error {
-				fmt.Println("Stopping all containers\n")
+				fmt.Println("Stopping all containers")
 				cmd := exec.Command("sh", "-c", "docker ps -q | xargs -n 1 -P 8 -I {} docker stop {}")
 				cmd.Stdout = os.Stdout
 				cmd.Stdin = os.Stdin
