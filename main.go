@@ -157,7 +157,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "captain"
 	app.Usage = "Start and stop docker compose projects"
-	app.Version = "0.3.0"
+	app.Version = "0.3.1"
 
 	app.Commands = []cli.Command{
 		{
