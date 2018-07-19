@@ -181,8 +181,9 @@ func main() {
 				fmt.Println("Starting " + project.Name + "\n")
 				if c.Bool("detach") {
 					dc(project, "up", "-d")
+				} else {
+					dc(project, "up")
 				}
-				dc(project, "up")
 
 				return nil
 			},
