@@ -15,18 +15,18 @@ Binaries can be manually downloaded from GitHub releases: https://github.com/jen
 #### OSX
 
 ```
-curl -L https://github.com/jenssegers/captain/releases/download/0.3.1/captain-osx > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+curl -L https://github.com/jenssegers/captain/releases/download/0.3.2/captain-osx > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
 
 #### Linux
 
 ```
-curl -L https://github.com/jenssegers/captain/releases/download/0.3.1/captain-linux > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
+curl -L https://github.com/jenssegers/captain/releases/download/0.3.2/captain-linux > /usr/local/bin/captain && chmod +x /usr/local/bin/captain
 ```
 
 #### Windows (untested)
 
-Download `captain.exe` via https://github.com/jenssegers/captain/releases/download/0.3.1/captain.exe
+Download `captain.exe` via https://github.com/jenssegers/captain/releases/download/0.3.2/captain.exe
 
 ## Usage
 
