@@ -64,6 +64,22 @@ Stopping a project works similarly:
 captain stop secret
 ```
 
+### Restarting a project
+
+Restart a project using:
+
+```
+captain restart my-secret-project
+```
+
+### Viewing project logs
+
+View logs of a project using:
+
+```
+captain logs my-secret-project
+```
+
 ### Listing projects
 
 You can see all managable projects using:
