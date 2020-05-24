@@ -299,8 +299,6 @@ func main() {
 
 				args := c.Args().Tail()[1:(len(c.Args()) - 1)]
 
-				fmt.Printf("%q\n", args)
-
 				fmt.Println("Executing command in " + project.Name + " " + service + "\n")
 
 				args = append([]string{"exec", service}, args...)
@@ -327,8 +325,6 @@ func main() {
 				}
 
 				args := c.Args().Tail()[1:(len(c.Args()) - 1)]
-
-				fmt.Printf("%q\n", args)
 
 				fmt.Println("Running command in " + project.Name + " " + service + "\n")
 
