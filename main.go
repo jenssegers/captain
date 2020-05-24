@@ -328,7 +328,7 @@ func main() {
 
 				fmt.Println("Running command in " + project.Name + " " + service + "\n")
 
-				args = append([]string{"run", service}, args...)
+				args = append([]string{"run", "--rm", service}, args...)
 				dc(project, args...)
 				return nil
 			},
