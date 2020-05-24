@@ -279,6 +279,64 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name:  "exec",
+			Usage: "Executing command in a running service container",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args()[0])
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				service := c.Args()[1]
+
+				if len(service) <= 0 {
+					fmt.Println("Missing service name")
+					return nil
+				}
+
+				args := c.Args().Tail()[1:(len(c.Args()) - 1)]
+
+				fmt.Printf("%q\n", args)
+
+				fmt.Println("Executing command in " + project.Name + " " + service + "\n")
+
+				args = append([]string{"exec", service}, args...)
+				dc(project, args...)
+				return nil
+			},
+		},
+		{
+			Name:  "run",
+			Usage: "Executing command as a new service container",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args()[0])
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				service := c.Args()[1]
+
+				if len(service) <= 0 {
+					fmt.Println("Missing service name")
+					return nil
+				}
+
+				args := c.Args().Tail()[1:(len(c.Args()) - 1)]
+
+				fmt.Printf("%q\n", args)
+
+				fmt.Println("Running command in " + project.Name + " " + service + "\n")
+
+				args = append([]string{"run", service}, args...)
+				dc(project, args...)
+				return nil
+			},
+		},
 	}
 
 	err := app.Run(os.Args)
