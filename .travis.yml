@@ -1,17 +1,15 @@
 sudo: required
 
 services:
-  - docker
+    - docker
 
 script:
-  - make build
+    - make build
 
 deploy:
-  provider: releases
-  api_key:
-    secure: $GITHUB_TOKEN
-  file_glob: true
-  file: dist/*
-  skip_cleanup: true
-  on:
-    tags: true
+    provider: releases
+    api_key: $GITHUB_TOKEN
+    file_glob: true
+    file: dist/*
+    on:
+        tags: true
