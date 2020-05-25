@@ -5,7 +5,7 @@
 Easily start and stop docker compose projects with captain, arrrrr.
 
 <p align="center">
-<img src="https://jenssegers.com/uploads/images/captain.png" width="250">
+<img src="https://jenssegers.com/static/media/captain.png" width="250">
 </p>
 
 ## Installation
