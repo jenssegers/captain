@@ -95,3 +95,26 @@ To quickly stop all running docker containers, use:
 ```
 captain abandon
 ```
+
+### Executing command in a service
+
+Executing command in a running service container
+
+```
+captain exec <project> <service> <command>
+captain exec my-secret-project web bash
+```
+
+Executing command as a new service container
+
+```
+captain run <project> <service> <command>
+captain exec my-secret-project cli bash
+```
+
+## Tweak the running
+
+You can tweak some behaviour through some environmental variables:
+
+* CAPTAIN_ROOT: the starting directory from where the docker-compose are searched (default: home dir of the user)
+* CAPTAIN_DEPTH: the number of subdirectory where to search the docker-compose.yml files (default: 5)
