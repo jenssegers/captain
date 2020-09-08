@@ -33,7 +33,7 @@ Download `captain.exe` via https://github.com/jenssegers/captain/releases/downlo
 Captain searches for docker-compose projects in your `$HOME` folder and allows you to start and stop those projects by matching the project's directory name.
 
 <p align="center">
-<img src="https://jenssegers.com/uploads/images/captain.gif?v2">
+<img src="https://jenssegers.com/static/media/captain.gif?v2">
 </p>
 
 ### Starting a project
