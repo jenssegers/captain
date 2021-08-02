@@ -224,6 +224,23 @@ func main() {
 			},
 		},
 		{
+			Name:  "pull",
+			Usage: "Pull images from a docker compose project",
+			Action: func(c *cli.Context) error {
+				project, err := search(c.Args().Get(0))
+
+				if err != nil {
+					fmt.Println(err.Error())
+					return nil
+				}
+
+				fmt.Println("Pulling " + project.Name + "\n")
+				dc(project, "pull")
+
+				return nil
+			},
+		},
+		{
 			Name:  "build",
 			Usage: "Build a docker compose project",
 			Action: func(c *cli.Context) error {
