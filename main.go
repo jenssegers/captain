@@ -77,7 +77,7 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 		}
 
 		// Search for docker-compose.yml file.
-		if !file.IsDir() && file.Name() == "docker-compose.yml" {
+		if !file.IsDir() && (file.Name() == "docker-compose.yml" || file.Name() == "docker-compose.yaml") {
 			results <- Project{
 				Path: filepath.Dir(path),
 				Name: strings.Trim(strings.Replace(filepath.Dir(path), config.Root, "", 1), "/"),
@@ -88,7 +88,7 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 		}
 	}
 
-	// If no docker-compose.yml file was found, scan all subdirectories that we found.
+	// If no docker-compose.yml/docker-compose.yaml file was found, scan all subdirectories that we found.
 	if depth > 1 {
 		for _, folder := range directories {
 			wg.Add(1)
