@@ -1,6 +1,0 @@
-package: github.com/jenssegers/captain
-import:
-- package: github.com/urfave/cli
-  version: ^1.20.0
-- package: github.com/sahilm/fuzzy
-  version: ^0.0.3
