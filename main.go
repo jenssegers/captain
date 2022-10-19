@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -115,6 +116,10 @@ func projects() []Project {
 	}()
 
 	wg.Wait()
+
+	sort.Slice(projects, func(i, j int) bool {
+		return projects[i].Name < projects[j].Name
+	})
 
 	return projects
 }
