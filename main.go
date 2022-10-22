@@ -107,21 +107,22 @@ func projects() []Project {
 	wg.Add(1)
 	go scan(&wg, config.Root, config.Depth, channel)
 
-	// Turn channel into slice.
-	projects := []Project{}
 	go func() {
-		for project := range channel {
-			projects = append(projects, project)
-		}
+		wg.Wait()
+		close(channel)
 	}()
 
-	wg.Wait()
+	// Turn channel into slice.
+	var results []Project
+	for project := range channel {
+		results = append(results, project)
+	}
 
-	sort.Slice(projects, func(i, j int) bool {
-		return projects[i].Name < projects[j].Name
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Name < results[j].Name
 	})
 
-	return projects
+	return results
 }
 
 func match(projects []Project, pattern string) (Project, error) {
