@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/signal"
 	"os/user"
 	"path/filepath"
 	"strconv"
@@ -146,7 +147,12 @@ func dc(project Project, arg ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+	signal.Ignore(os.Interrupt)
+	defer signal.Reset(os.Interrupt)
+	return cmd.Wait()
 }
 
 func search(pattern string) (Project, error) {
