@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -78,8 +79,8 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 			continue
 		}
 
-		// Search for docker-compose.yml file.
-		if !file.IsDir() && (file.Name() == "docker-compose.yml" || file.Name() == "docker-compose.yaml") {
+		// Search for compose files.
+		if !file.IsDir() && (isComposeFile(file)) {
 			results <- Project{
 				Path: filepath.Dir(path),
 				Name: strings.Trim(strings.Replace(filepath.Dir(path), config.Root, "", 1), "/"),
@@ -90,7 +91,7 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 		}
 	}
 
-	// If no docker-compose.yml/docker-compose.yaml file was found, scan all subdirectories that we found.
+	// If no valid compose file was found, scan all subdirectories that we found.
 	if depth > 1 {
 		for _, folder := range directories {
 			wg.Add(1)
@@ -99,6 +100,21 @@ func scan(wg *sync.WaitGroup, folder string, depth int, results chan Project) {
 	}
 
 	return
+}
+
+func isComposeFile(file fs.FileInfo) bool {
+	composeFileNames := [...]string{
+		"compose.yaml",
+		"compose.yml",
+		"docker-compose.yaml",
+		"docker-compose.yml",
+	}
+	for _, composeFileName := range composeFileNames {
+		if file.Name() == composeFileName {
+			return true
+		}
+	}
+	return false
 }
 
 func projects() []Project {
