@@ -109,7 +109,7 @@ Executing command as a new service container
 
 ```
 captain run <project> <service> <command>
-captain exec my-secret-project cli bash
+captain run my-secret-project cli bash
 ```
 
 ## Tweak the running
