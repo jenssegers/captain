@@ -4,6 +4,8 @@ services:
     - docker
 
 script:
+    - export VERSION=$(git describe --tags)
+    - sed -i "s/CAPTAIN_VERSION/${VERSION}/" main.go
     - make build
 
 deploy:
